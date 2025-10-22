@@ -13,9 +13,10 @@ import { Eye, EyeOff, Lock, Mail, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { login } from '@/lib/auth';
+import { getFieldErrorProps } from '@/lib/utils';
 
 const emailLoginSchema = z.object({
    email: z.email('Email inválido'),
@@ -53,8 +54,6 @@ export default function LoginPage() {
          password: '',
       },
    });
-
-   const currentForm = loginMethod === 'email' ? emailForm : phoneForm;
 
    const handleSubmit = (data: EmailLoginForm | PhoneLoginForm) => {
       console.log('[v0] Login attempt:', data);
@@ -95,84 +94,149 @@ export default function LoginPage() {
                   </Button>
                </div>
 
-               <form
-                  onSubmit={currentForm.handleSubmit(handleSubmit)}
-                  className="flex flex-col gap-4"
-               >
-                  {loginMethod === 'email' ? (
-                     <Input
-                        type="email"
-                        label="Email"
-                        placeholder="seu@email.com"
-                        startContent={
-                           <Mail className="h-4 w-4 text-default-400" />
-                        }
-                        {...emailForm.register('email')}
-                        isInvalid={!!emailForm.formState.errors.email}
-                        errorMessage={emailForm.formState.errors.email?.message}
-                        isRequired
-                     />
-                  ) : (
-                     <Input
-                        type="tel"
-                        label="Celular"
-                        placeholder="(67) 99999-9999"
-                        startContent={
-                           <Phone className="h-4 w-4 text-default-400" />
-                        }
-                        {...phoneForm.register('phone')}
-                        isInvalid={!!phoneForm.formState.errors.phone}
-                        errorMessage={phoneForm.formState.errors.phone?.message}
-                        isRequired
-                     />
-                  )}
-
-                  <Input
-                     type={showPassword ? 'text' : 'password'}
-                     label="Senha"
-                     placeholder="Digite sua senha"
-                     startContent={
-                        <Lock className="h-4 w-4 text-default-400" />
-                     }
-                     endContent={
-                        <button
-                           type="button"
-                           onClick={() => setShowPassword(!showPassword)}
-                           className="focus:outline-none"
-                        >
-                           {showPassword ? (
-                              <EyeOff className="h-4 w-4 text-default-400" />
-                           ) : (
-                              <Eye className="h-4 w-4 text-default-400" />
-                           )}
-                        </button>
-                     }
-                     {...currentForm.register('password')}
-                     isInvalid={!!currentForm.formState.errors.password}
-                     errorMessage={
-                        currentForm.formState.errors.password?.message
-                     }
-                     isRequired
-                  />
-
-                  <div className="flex justify-end">
-                     <Link
-                        href="/recuperar-senha"
-                        className="text-primary text-sm hover:underline"
-                     >
-                        Esqueceu a senha?
-                     </Link>
-                  </div>
-
-                  <Button
-                     type="submit"
-                     color="primary"
-                     size="lg"
-                     className="font-semibold"
+               {loginMethod === 'email' ? (
+                  <form
+                     onSubmit={emailForm.handleSubmit(handleSubmit)}
+                     className="flex flex-col gap-4"
                   >
-                     Entrar
-                  </Button>
-               </form>
+                     <Controller
+                        name="email"
+                        control={emailForm.control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type="email"
+                              label="Email"
+                              placeholder="seu@email.com"
+                              startContent={
+                                 <Mail className="h-4 w-4 text-default-400" />
+                              }
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
+                     />
+
+                     <Controller
+                        name="password"
+                        control={emailForm.control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type={showPassword ? 'text' : 'password'}
+                              label="Senha"
+                              placeholder="Digite sua senha"
+                              startContent={
+                                 <Lock className="h-4 w-4 text-default-400" />
+                              }
+                              endContent={
+                                 <Button
+                                    type="button"
+                                    isIconOnly
+                                    variant={'light'}
+                                    onPress={() =>
+                                       setShowPassword(!showPassword)
+                                    }
+                                    className="focus:outline-none"
+                                 >
+                                    {showPassword ? (
+                                       <EyeOff className="h-4 w-4 text-default-400" />
+                                    ) : (
+                                       <Eye className="h-4 w-4 text-default-400" />
+                                    )}
+                                 </Button>
+                              }
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
+                     />
+                  </form>
+               ) : (
+                  <form
+                     onSubmit={phoneForm.handleSubmit(handleSubmit)}
+                     className="flex flex-col gap-4"
+                  >
+                     <Controller
+                        name="phone"
+                        control={phoneForm.control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type="tel"
+                              label="Celular"
+                              placeholder="(67) 99999-9999"
+                              startContent={
+                                 <Phone className="h-4 w-4 text-default-400" />
+                              }
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
+                     />
+
+                     <Controller
+                        name="password"
+                        control={phoneForm.control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type={showPassword ? 'text' : 'password'}
+                              label="Senha"
+                              placeholder="Digite sua senha"
+                              startContent={
+                                 <Lock className="h-4 w-4 text-default-400" />
+                              }
+                              endContent={
+                                 <Button
+                                    type="button"
+                                    isIconOnly
+                                    size={'sm'}
+                                    variant={'light'}
+                                    onPress={() =>
+                                       setShowPassword(!showPassword)
+                                    }
+                                    className="focus:outline-none"
+                                 >
+                                    {showPassword ? (
+                                       <EyeOff className="h-4 w-4 text-default-400" />
+                                    ) : (
+                                       <Eye className="h-4 w-4 text-default-400" />
+                                    )}
+                                 </Button>
+                              }
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
+                     />
+                  </form>
+               )}
+
+               <div className="flex justify-end">
+                  <Link
+                     href="/recuperar-senha"
+                     className="text-primary text-sm hover:underline"
+                  >
+                     Esqueceu a senha?
+                  </Link>
+               </div>
+
+               <Button
+                  type="submit"
+                  color="primary"
+                  size="lg"
+                  className="font-semibold"
+                  onPress={() => {
+                     if (loginMethod === 'email') {
+                        emailForm.handleSubmit(handleSubmit)();
+                     } else {
+                        phoneForm.handleSubmit(handleSubmit)();
+                     }
+                  }}
+               >
+                  Entrar
+               </Button>
 
                <Divider />
 

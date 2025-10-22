@@ -1,8 +1,8 @@
-import { CTASection } from '@/features/home/cta-section';
-import { FeaturesSection } from '@/features/home/features-section';
-import { HeroSection } from '@/features/home/hero-section';
-import { HowItWorksSection } from '@/features/home/how-it-works-section';
-import { StatsSection } from '@/features/home/stats-section';
+import { CTASection } from '@/features/home/components/cta-section';
+import { FeaturesSection } from '@/features/home/components/features-section';
+import { HeroSection } from '@/features/home/components/hero-section';
+import { HowItWorksSection } from '@/features/home/components/how-it-works-section';
+import { StatsSection } from '@/features/home/components/stats-section';
 
 export default function HomePage() {
    return (

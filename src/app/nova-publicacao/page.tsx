@@ -20,43 +20,39 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { AuthGuard } from '@/components/auth-guard';
+import { getFieldErrorProps } from '@/lib/utils';
 
-const publicacaoSchema = z.object({
-   nome: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres'),
-   especie: z.string().min(1, 'Selecione a espécie'),
-   porte: z.string().min(1, 'Selecione o porte'),
-   cor: z.string().min(2, 'Cor deve ter no mínimo 2 caracteres'),
-   dataDesaparecimento: z.string().min(1, 'Data é obrigatória'),
-   localizacao: z
+const publicationSchema = z.object({
+   name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres'),
+   species: z.string().min(1, 'Selecione a espécie'),
+   size: z.string().min(1, 'Selecione o porte'),
+   color: z.string().min(2, 'Cor deve ter no mínimo 2 caracteres'),
+   disappearanceDate: z.string().min(1, 'Data é obrigatória'),
+   location: z.string().min(5, 'Localização deve ter no mínimo 5 caracteres'),
+   description: z
       .string()
-      .min(5, 'Localização deve ter no mínimo 5 caracteres'),
-   descricao: z.string().min(10, 'Descrição deve ter no mínimo 10 caracteres'),
+      .min(10, 'Descrição deve ter no mínimo 10 caracteres'),
 });
 
-type PublicacaoForm = z.infer<typeof publicacaoSchema>;
+type PublicationForm = z.infer<typeof publicationSchema>;
 
-const especies = ['Cachorro', 'Gato', 'Pássaro', 'Outro'];
-const portes = ['Pequeno', 'Médio', 'Grande'];
+const speciesOptions = ['Cachorro', 'Gato', 'Pássaro', 'Outro'] as const;
+const sizeOptions = ['Pequeno', 'Médio', 'Grande'];
 
-function NovaPublicacaoContent() {
+function NewPublicationContent() {
    const router = useRouter();
    const [images, setImages] = useState<string[]>([]);
 
-   const {
-      register,
-      handleSubmit,
-      control,
-      formState: { errors },
-   } = useForm<PublicacaoForm>({
-      resolver: zodResolver(publicacaoSchema),
+   const { handleSubmit, control } = useForm<PublicationForm>({
+      resolver: zodResolver(publicationSchema),
       defaultValues: {
-         nome: '',
-         especie: '',
-         porte: '',
-         cor: '',
-         dataDesaparecimento: '',
-         localizacao: '',
-         descricao: '',
+         name: '',
+         species: '',
+         size: '',
+         color: '',
+         disappearanceDate: '',
+         location: '',
+         description: '',
       },
    });
 
@@ -86,7 +82,7 @@ function NovaPublicacaoContent() {
       setImages(images.filter((_, i) => i !== index));
    };
 
-   const onSubmit = (data: PublicacaoForm) => {
+   const onSubmit = (data: PublicationForm) => {
       console.log('[v0] New post data:', { ...data, images });
       router.push('/feed');
    };
@@ -161,44 +157,46 @@ function NovaPublicacaoContent() {
                         )}
                      </div>
 
-                     <Input
-                        type="text"
-                        label="Nome do Pet"
-                        placeholder="Ex: Rex, Mimi, Thor..."
-                        {...register('nome')}
-                        isInvalid={!!errors.nome}
-                        errorMessage={errors.nome?.message}
-                        isRequired
+                     <Controller
+                        name="name"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type="text"
+                              label="Nome do Pet"
+                              placeholder="Ex: Rex, Mimi, Thor..."
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
                      />
 
                      <Controller
-                        name="especie"
+                        name="species"
                         control={control}
-                        render={({ field }) => (
+                        render={({ field, fieldState }) => (
                            <Select
                               label="Espécie"
+                              isRequired
                               placeholder="Selecione a espécie"
                               selectedKeys={field.value ? [field.value] : []}
                               onSelectionChange={(keys) =>
                                  field.onChange(Array.from(keys)[0])
                               }
-                              isInvalid={!!errors.especie}
-                              errorMessage={errors.especie?.message}
-                              isRequired
+                              {...getFieldErrorProps(fieldState)}
                            >
-                              {especies.map((especie) => (
-                                 <SelectItem key={especie} value={especie}>
-                                    {especie}
-                                 </SelectItem>
+                              {speciesOptions.map((option) => (
+                                 <SelectItem key={option}>{option}</SelectItem>
                               ))}
                            </Select>
                         )}
                      />
 
                      <Controller
-                        name="porte"
+                        name="size"
                         control={control}
-                        render={({ field }) => (
+                        render={({ field, fieldState }) => (
                            <Select
                               label="Porte"
                               placeholder="Selecione o porte"
@@ -206,56 +204,73 @@ function NovaPublicacaoContent() {
                               onSelectionChange={(keys) =>
                                  field.onChange(Array.from(keys)[0])
                               }
-                              isInvalid={!!errors.porte}
-                              errorMessage={errors.porte?.message}
+                              {...getFieldErrorProps(fieldState)}
                               isRequired
                            >
-                              {portes.map((porte) => (
-                                 <SelectItem key={porte} value={porte}>
-                                    {porte}
-                                 </SelectItem>
+                              {sizeOptions.map((option) => (
+                                 <SelectItem key={option}>{option}</SelectItem>
                               ))}
                            </Select>
                         )}
                      />
 
-                     <Input
-                        type="text"
-                        label="Cor"
-                        placeholder="Ex: Marrom, Branco e Preto..."
-                        {...register('cor')}
-                        isInvalid={!!errors.cor}
-                        errorMessage={errors.cor?.message}
-                        isRequired
+                     <Controller
+                        name="color"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type="text"
+                              label="Cor"
+                              placeholder="Ex: Marrom, Branco e Preto..."
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
                      />
 
-                     <Input
-                        type="date"
-                        label="Data de Desaparecimento"
-                        {...register('dataDesaparecimento')}
-                        isInvalid={!!errors.dataDesaparecimento}
-                        errorMessage={errors.dataDesaparecimento?.message}
-                        isRequired
+                     <Controller
+                        name="disappearanceDate"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type="date"
+                              label="Data de Desaparecimento"
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
                      />
 
-                     <Input
-                        type="text"
-                        label="Localização"
-                        placeholder="Ex: Bairro Monte Castelo, Campo Grande - MS"
-                        {...register('localizacao')}
-                        isInvalid={!!errors.localizacao}
-                        errorMessage={errors.localizacao?.message}
-                        isRequired
+                     <Controller
+                        name="location"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                           <Input
+                              type="text"
+                              label="Localização"
+                              placeholder="Ex: Bairro Monte Castelo, Campo Grande - MS"
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
                      />
 
-                     <Textarea
-                        label="Descrição"
-                        placeholder="Descreva características, comportamento, circunstâncias do desaparecimento..."
-                        minRows={4}
-                        {...register('descricao')}
-                        isInvalid={!!errors.descricao}
-                        errorMessage={errors.descricao?.message}
-                        isRequired
+                     <Controller
+                        name="description"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                           <Textarea
+                              label="Descrição"
+                              placeholder="Descreva características, comportamento, circunstâncias do desaparecimento..."
+                              minRows={4}
+                              {...field}
+                              {...getFieldErrorProps(fieldState)}
+                              isRequired
+                           />
+                        )}
                      />
 
                      <div className="flex gap-4 pt-4">
@@ -284,10 +299,10 @@ function NovaPublicacaoContent() {
    );
 }
 
-export default function NovaPublicacaoPage() {
+export default function NewPublicationPage() {
    return (
       <AuthGuard>
-         <NovaPublicacaoContent />
+         <NewPublicationContent />
       </AuthGuard>
    );
 }
