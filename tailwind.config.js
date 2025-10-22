@@ -21,20 +21,6 @@ const config = {
          themes: {
             light: {
                colors: {
-                  default: {
-                     50: '#fafafa',
-                     100: '#f2f2f3',
-                     200: '#ebebec',
-                     300: '#e3e3e6',
-                     400: '#dcdcdf',
-                     500: '#d4d4d8',
-                     600: '#afafb2',
-                     700: '#8a8a8c',
-                     800: '#656567',
-                     900: '#404041',
-                     foreground: '#000',
-                     DEFAULT: '#d4d4d8',
-                  },
                   muted: {
                      DEFAULT: '#6f717d',
                      foreground: '#6F717DFF',
@@ -110,7 +96,6 @@ const config = {
                      DEFAULT: '#f31260',
                   },
                   background: '#ffffff',
-                  foreground: '#20212b',
                   content1: {
                      DEFAULT: '#ffffff',
                      foreground: '#fff',

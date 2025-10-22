@@ -10,17 +10,31 @@ import {
    NavbarMenuItem,
    NavbarMenuToggle,
 } from '@heroui/react';
+import { Heart, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
-import { AppLogo } from '@/components/app-logo';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { isAuthenticated, logout } from '@/lib/auth';
 
 export function Header() {
    const [isMenuOpen, setIsMenuOpen] = useState(false);
+   const [isLoggedIn, setIsLoggedIn] = useState(false);
+   const router = useRouter();
+
+   useEffect(() => {
+      setIsLoggedIn(isAuthenticated());
+   }, []);
+
+   const handleLogout = () => {
+      logout();
+      setIsLoggedIn(false);
+      router.push('/');
+   };
 
    const menuItems = [
-      { label: 'Como Funciona', href: '#como-funciona' },
-      { label: 'Recursos', href: '#recursos' },
-      { label: 'Sobre', href: '#sobre' },
+      { label: 'Como Funciona', href: '/#como-funciona' },
+      { label: 'Recursos', href: '/#recursos' },
+      { label: 'Sobre', href: '/#sobre' },
    ];
 
    return (
@@ -28,7 +42,7 @@ export function Header() {
          isMenuOpen={isMenuOpen}
          onMenuOpenChange={setIsMenuOpen}
          maxWidth="xl"
-         isBordered
+         className="border-divider border-b"
       >
          <NavbarContent>
             <NavbarMenuToggle
@@ -36,8 +50,13 @@ export function Header() {
                className="sm:hidden"
             />
             <NavbarBrand>
-               <Link href="/">
-                  <AppLogo />
+               <Link href="/" className="flex items-center gap-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
+                     <Heart className="h-6 w-6 fill-current text-primary-foreground" />
+                  </div>
+                  <span className="font-bold font-heading text-xl">
+                     EncontraPet
+                  </span>
                </Link>
             </NavbarBrand>
          </NavbarContent>
@@ -47,7 +66,7 @@ export function Header() {
                <NavbarItem key={item.href}>
                   <Link
                      href={item.href}
-                     className="font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+                     className="font-medium text-default-600 text-sm transition-colors hover:text-foreground"
                   >
                      {item.label}
                   </Link>
@@ -56,17 +75,54 @@ export function Header() {
          </NavbarContent>
 
          <NavbarContent justify="end">
-            <NavbarItem className="hidden sm:flex">
-               <Button
-                  as={Link}
-                  href="/cadastrar"
-                  color="primary"
-                  variant="solid"
-                  className="font-semibold"
-               >
-                  Começar Agora
-               </Button>
-            </NavbarItem>
+            {isLoggedIn ? (
+               <>
+                  <NavbarItem className="hidden sm:flex">
+                     <Button
+                        as={Link}
+                        href="/feed"
+                        color="primary"
+                        variant="light"
+                     >
+                        Feed
+                     </Button>
+                  </NavbarItem>
+                  <NavbarItem className="hidden sm:flex">
+                     <Button
+                        color="danger"
+                        variant="light"
+                        startContent={<LogOut className="h-4 w-4" />}
+                        onClick={handleLogout}
+                     >
+                        Sair
+                     </Button>
+                  </NavbarItem>
+               </>
+            ) : (
+               <>
+                  <NavbarItem className="hidden sm:flex">
+                     <Button
+                        as={Link}
+                        href="/login"
+                        color="primary"
+                        variant="light"
+                     >
+                        Entrar
+                     </Button>
+                  </NavbarItem>
+                  <NavbarItem className="hidden sm:flex">
+                     <Button
+                        as={Link}
+                        href="/registro"
+                        color="primary"
+                        variant="solid"
+                        className="font-semibold"
+                     >
+                        Cadastrar
+                     </Button>
+                  </NavbarItem>
+               </>
+            )}
          </NavbarContent>
 
          <NavbarMenu>
@@ -81,18 +137,62 @@ export function Header() {
                   </Link>
                </NavbarMenuItem>
             ))}
-            <NavbarMenuItem>
-               <Button
-                  as={Link}
-                  href="/cadastrar"
-                  color="primary"
-                  variant="solid"
-                  className="w-full font-semibold"
-                  onPress={() => setIsMenuOpen(false)}
-               >
-                  Começar Agora
-               </Button>
-            </NavbarMenuItem>
+            {isLoggedIn ? (
+               <>
+                  <NavbarMenuItem>
+                     <Button
+                        as={Link}
+                        href="/feed"
+                        color="primary"
+                        variant="solid"
+                        className="w-full font-semibold"
+                        onClick={() => setIsMenuOpen(false)}
+                     >
+                        Feed
+                     </Button>
+                  </NavbarMenuItem>
+                  <NavbarMenuItem>
+                     <Button
+                        color="danger"
+                        variant="solid"
+                        className="w-full font-semibold"
+                        onClick={() => {
+                           handleLogout();
+                           setIsMenuOpen(false);
+                        }}
+                     >
+                        Sair
+                     </Button>
+                  </NavbarMenuItem>
+               </>
+            ) : (
+               <>
+                  <NavbarMenuItem>
+                     <Button
+                        as={Link}
+                        href="/login"
+                        color="primary"
+                        variant="light"
+                        className="w-full"
+                        onClick={() => setIsMenuOpen(false)}
+                     >
+                        Entrar
+                     </Button>
+                  </NavbarMenuItem>
+                  <NavbarMenuItem>
+                     <Button
+                        as={Link}
+                        href="/registro"
+                        color="primary"
+                        variant="solid"
+                        className="w-full font-semibold"
+                        onClick={() => setIsMenuOpen(false)}
+                     >
+                        Cadastrar
+                     </Button>
+                  </NavbarMenuItem>
+               </>
+            )}
          </NavbarMenu>
       </Navbar>
    );

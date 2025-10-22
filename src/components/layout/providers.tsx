@@ -10,7 +10,7 @@ export function Providers(props: ProvidersProps) {
    const { children } = props;
 
    return (
-      <HeroUIProvider>
+      <HeroUIProvider labelPlacement={'inside'}>
          <Header />
          {children}
          <Footer />
