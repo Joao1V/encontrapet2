@@ -1,11 +1,19 @@
 import { HeroUIProvider } from '@heroui/react';
+import { Footer } from '@/components/layout/footer';
+import { Header } from '@/components/layout/header';
 
 type ProvidersProps = {
-  children: React.ReactNode;
+   children: React.ReactNode;
 };
 
 export function Providers(props: ProvidersProps) {
-  const { children } = props;
+   const { children } = props;
 
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+   return (
+      <HeroUIProvider>
+         <Header />
+         {children}
+         <Footer />
+      </HeroUIProvider>
+   );
 }
